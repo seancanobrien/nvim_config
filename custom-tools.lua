@@ -1,6 +1,5 @@
-require 'maxima'
-require 'mathematica'
-require 'latex'
-require 'gap'
-require 'markdown'
+-- Filetype specific
 require 'zsh'
+
+-- General Purpose
+require 'useful_shortcuts'

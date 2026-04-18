@@ -1,0 +1,12 @@
+# environments that have tab delimiters, add more
+# as needed
+lookForAlignDelims:
+    tabbing: 1
+
+modifyLineBreaks:
+    oneSentencePerLine:
+        manipulateSentences: 1
+        removeSentenceLineBreaks: 0
+
+lookForAlignDelims:
+    tikzcd: 1
