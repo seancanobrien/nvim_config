@@ -92,6 +92,34 @@ return {
       })
       vim.lsp.enable 'lua_ls'
 
+      -- basedpyright (python)
+      vim.lsp.config('basedpyright', {
+        cmd = { 'basedpyright-langserver', '--stdio' },
+        filetypes = { 'python' },
+        root_markers = {
+          'pyproject.toml',
+          'setup.py',
+          'setup.cfg',
+          'requirements.txt',
+          'Pipfile',
+          'pyrightconfig.json',
+          '.git',
+        },
+        on_attach = global_on_attach,
+        settings = {
+          basedpyright = {
+            analysis = {
+              typeCheckingMode = 'basic',
+              autoSearchPaths = true,
+              useLibraryCodeForTypes = true,
+              diagnosticMode = 'workspace',
+            },
+          },
+        },
+      })
+
+      vim.lsp.enable 'basedpyright'
+
       -- LTeX (LaTeX/Markdown grammar checking)
       vim.lsp.config('ltex', {
         cmd = { 'ltex-ls' },
