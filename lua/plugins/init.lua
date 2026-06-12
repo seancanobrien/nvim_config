@@ -55,12 +55,12 @@ vim.pack.add {
   { src = 'https://github.com/HiPhish/rainbow-delimiters.nvim' },
   { src = 'https://github.com/folke/todo-comments.nvim' },
   { src = 'https://github.com/folke/zen-mode.nvim' },
+  { src = 'https://github.com/MeanderingProgrammer/render-markdown.nvim' },
 
   -- Telescope + extensions
   { src = 'https://github.com/nvim-telescope/telescope.nvim', version = '0.1.x' },
   { src = 'https://github.com/nvim-telescope/telescope-fzf-native.nvim', data = { build = 'make' } },
   { src = 'https://github.com/nvim-telescope/telescope-ui-select.nvim' },
-  { src = 'https://github.com/debugloop/telescope-undo.nvim' },
 
   -- Treesitter (modern `main` branch; parsers compiled via :TSUpdate)
   { src = 'https://github.com/nvim-treesitter/nvim-treesitter', version = 'main' },
@@ -69,7 +69,6 @@ vim.pack.add {
   { src = 'https://github.com/nvim-neo-tree/neo-tree.nvim' },
   { src = 'https://github.com/ThePrimeagen/harpoon', version = 'harpoon2' },
   { src = 'https://github.com/kevinhwang91/nvim-bqf' },
-  { src = 'https://github.com/mbbill/undotree' },
   { src = 'https://github.com/junegunn/fzf', data = { build = './install --bin' } },
   { src = 'https://github.com/junegunn/fzf.vim' },
 
@@ -113,8 +112,8 @@ local modules = {
   'indent-blankline',
   'rainbow-delimiters',
   'todo-comments',
+  'render-markdown',
   'telescope',
-  'telescope-undo',
   'treesitter',
   'neo-tree',
   'harpoon',
