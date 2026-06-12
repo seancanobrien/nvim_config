@@ -19,6 +19,11 @@ vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 -- Diagnostic keymaps
 -- NOTE: native `[d`/`]d` jump between diagnostics on 0.11+, so we don't remap them.
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Show diagnostic [E]rror messages' })
+-- Toggle inline virtual-text diagnostics (off by default; see config/lsp.lua).
+vim.keymap.set('n', '<leader>tv', function()
+  local enabled = vim.diagnostic.config().virtual_text
+  vim.diagnostic.config { virtual_text = not enabled }
+end, { desc = '[T]oggle diagnostic [v]irtual text' })
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier

@@ -33,6 +33,9 @@ vim.api.nvim_create_autocmd('LspAttach', {
     map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
     map('K', vim.lsp.buf.hover, 'Hover Documentation')
     map('<leader>D', vim.lsp.buf.type_definition, 'Type [D]efinition')
+    -- Code actions (e.g. ltex "Add word to dictionary"). Also `gra` natively.
+    map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction')
+    vim.keymap.set('x', '<leader>ca', vim.lsp.buf.code_action, { buffer = bufnr, desc = 'LSP: [C]ode [A]ction' })
 
     -- Enable native LSP completion for this client/buffer
     if client:supports_method 'textDocument/completion' then
@@ -66,12 +69,37 @@ vim.api.nvim_create_autocmd('LspAttach', {
     if client.name == 'ltex' then
       local ok, ltex_extra = pcall(require, 'ltex_extra')
       if ok then
+        -- Runs synchronously: replaces settings.ltex.dictionary['en-GB'] with the
+        -- project's .dictionaries words and notifies the server.
         ltex_extra.setup {
           load_langs = { 'en-GB' },
           init_check = true,
           path = '.dictionaries',
         }
       end
+
+      -- Merge a global word list (shared across all projects) into the project
+      -- dictionary. The ':'-prefixed external-file syntax is a VSCode-client
+      -- feature the server doesn't expand, so we read the file ourselves and
+      -- pass the words inline (the mechanism ltex-extra uses for project words).
+      -- ltex_extra.reload() defers its dictionary update via vim.schedule and
+      -- replaces dictionary['en-GB'] wholesale, so schedule our merge to run
+      -- after it (queued later on the same event loop) or it gets clobbered.
+      local global_path = vim.fn.expand '~/.config/nvim/ltex/dictionary.en-GB.txt'
+      local global_words = vim.fn.filereadable(global_path) == 1 and vim.fn.readfile(global_path) or {}
+      vim.schedule(function()
+        local settings = client.config.settings
+        settings.ltex = settings.ltex or {}
+        settings.ltex.dictionary = settings.ltex.dictionary or {}
+        local words = settings.ltex.dictionary['en-GB'] or {}
+        for _, w in ipairs(global_words) do
+          if w ~= '' and not vim.tbl_contains(words, w) then
+            table.insert(words, w)
+          end
+        end
+        settings.ltex.dictionary['en-GB'] = words
+        client:notify('workspace/didChangeConfiguration', settings)
+      end)
     end
   end,
 })
@@ -136,6 +164,15 @@ vim.lsp.enable 'basedpyright'
 vim.lsp.config('ltex', {
   cmd = { 'ltex-ls-plus' },
   filetypes = { 'tex', 'latex', 'markdown' },
+  -- Neovim's filetype for *.tex is `tex`, but ltex only checks documents whose
+  -- languageId is in its enabled set (`latex`, `markdown`, ...) and `tex` is not.
+  -- Translate so LaTeX files actually get grammar-checked.
+  get_language_id = function(_, filetype)
+    if filetype == 'tex' then
+      return 'latex'
+    end
+    return filetype
+  end,
   settings = {
     ltex = {
       language = 'en-GB',
