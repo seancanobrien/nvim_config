@@ -15,6 +15,11 @@ vim.diagnostic.config {
 vim.o.autocomplete = true
 vim.o.completeopt = 'menu,menuone,popup,noinsert'
 
+-- ltex attaches to many buffers but is a single client; its dictionary setup
+-- must run once per client, not once per buffer (ltex_extra's deferred reload
+-- targets the *current* buffer and errors when focus has moved on).
+local ltex_setup_done = {}
+
 -- One LspAttach handles buffer keymaps, completion and capability-gated features
 -- for every server, replacing the per-server on_attach hooks.
 vim.api.nvim_create_autocmd('LspAttach', {
@@ -65,41 +70,41 @@ vim.api.nvim_create_autocmd('LspAttach', {
       vim.lsp.inlay_hint.enable(false, { bufnr = bufnr })
     end
 
-    -- ltex-specific: load custom dictionaries / disabled rules
-    if client.name == 'ltex' then
-      local ok, ltex_extra = pcall(require, 'ltex_extra')
-      if ok then
-        -- Runs synchronously: replaces settings.ltex.dictionary['en-GB'] with the
-        -- project's .dictionaries words and notifies the server.
-        ltex_extra.setup {
-          load_langs = { 'en-GB' },
-          init_check = true,
-          path = '.dictionaries',
-        }
+    -- ltex-specific: load custom dictionaries / disabled rules (once per client).
+    if client.name == 'ltex' and not ltex_setup_done[client.id] then
+      ltex_setup_done[client.id] = true
+      local lang = 'en-GB'
+
+      -- ltex_extra only for its add-to-dictionary / hide-false-positive / disable-
+      -- rule code-action commands. init_check is OFF: its reload defers a
+      -- current-buffer lookup that errors when ltex (slow JVM) attaches to a
+      -- background buffer, so we load the persisted lists ourselves below.
+      pcall(function()
+        require('ltex_extra').setup { load_langs = { lang }, init_check = false, path = '.dictionaries' }
+      end)
+
+      -- Read a `.txt` word/rule list, one entry per line, or {} if missing.
+      local function read_list(path)
+        return vim.fn.filereadable(path) == 1 and vim.fn.readfile(path) or {}
       end
 
-      -- Merge a global word list (shared across all projects) into the project
-      -- dictionary. The ':'-prefixed external-file syntax is a VSCode-client
-      -- feature the server doesn't expand, so we read the file ourselves and
-      -- pass the words inline (the mechanism ltex-extra uses for project words).
-      -- ltex_extra.reload() defers its dictionary update via vim.schedule and
-      -- replaces dictionary['en-GB'] wholesale, so schedule our merge to run
-      -- after it (queued later on the same event loop) or it gets clobbered.
-      local global_path = vim.fn.expand '~/.config/nvim/ltex/dictionary.en-GB.txt'
-      local global_words = vim.fn.filereadable(global_path) == 1 and vim.fn.readfile(global_path) or {}
-      vim.schedule(function()
-        local settings = client.config.settings
-        settings.ltex = settings.ltex or {}
-        settings.ltex.dictionary = settings.ltex.dictionary or {}
-        local words = settings.ltex.dictionary['en-GB'] or {}
-        for _, w in ipairs(global_words) do
-          if w ~= '' and not vim.tbl_contains(words, w) then
-            table.insert(words, w)
-          end
+      -- Project lists live at <cwd>/.dictionaries/ltex.<type>.<lang>.txt
+      -- (the same files ltex_extra reads/writes); the dictionary also gets a
+      -- global word list shared across all projects merged on top.
+      local proj = vim.fs.normalize(vim.uv.cwd() .. '/.dictionaries')
+      local dict = read_list(proj .. '/ltex.dictionary.' .. lang .. '.txt')
+      for _, w in ipairs(read_list(vim.fn.expand '~/.config/nvim/ltex/dictionary.' .. lang .. '.txt')) do
+        if w ~= '' and not vim.tbl_contains(dict, w) then
+          table.insert(dict, w)
         end
-        settings.ltex.dictionary['en-GB'] = words
-        client:notify('workspace/didChangeConfiguration', settings)
-      end)
+      end
+
+      local settings = client.config.settings
+      settings.ltex = settings.ltex or {}
+      settings.ltex.dictionary = { [lang] = dict }
+      settings.ltex.disabledRules = { [lang] = read_list(proj .. '/ltex.disabledRules.' .. lang .. '.txt') }
+      settings.ltex.hiddenFalsePositives = { [lang] = read_list(proj .. '/ltex.hiddenFalsePositives.' .. lang .. '.txt') }
+      client:notify('workspace/didChangeConfiguration', settings)
     end
   end,
 })
