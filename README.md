@@ -30,7 +30,7 @@ but has since been restructured and trimmed down.
     `vim.g.have_nerd_font = false` in `init.lua` if you don't use one.
 * Language servers (installed standalone via [`mason`](https://github.com/williamboman/mason.nvim),
   or put them on `PATH` yourself): `lua-language-server`, `basedpyright`,
-  `ltex-ls`, `texlab`.
+  `ltex-ls-plus`, `texlab`.
 * LaTeX workflow extras: `latexmk`, `latexindent`, `zathura` (for VimTeX),
   plus a `python3` with `jupytext` for `.ipynb` editing.
 

@@ -131,8 +131,10 @@ vim.lsp.config('basedpyright', {
 vim.lsp.enable 'basedpyright'
 
 -- LTeX (LaTeX/Markdown grammar checking). ltex_extra is wired up in LspAttach.
+-- Uses ltex-ls-plus (maintained fork); the original valentjn/ltex-ls leaks
+-- LanguageTool warnings onto stdout, corrupting the LSP stream so it never attaches.
 vim.lsp.config('ltex', {
-  cmd = { 'ltex-ls' },
+  cmd = { 'ltex-ls-plus' },
   filetypes = { 'tex', 'latex', 'markdown' },
   settings = {
     ltex = {
