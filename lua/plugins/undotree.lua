@@ -5,4 +5,8 @@
 vim.cmd 'silent! packadd nvim.undotree'
 
 -- Toggle the undo-tree window. Moving the cursor in it changes the undo state.
-vim.keymap.set('n', '<leader>uu', '<cmd>Undotree<CR>', { desc = 'Toggle [u]ndotree' })
+-- `:Undotree` hardcodes a 30-column window which truncates the timestamps
+-- (`YYYY/MM/DD HH:MM:SS`), so call open() directly with a wider window.
+vim.keymap.set('n', '<leader>uu', function()
+  require('undotree').open { command = '60vnew' }
+end, { desc = 'Toggle [u]ndotree' })
