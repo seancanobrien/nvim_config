@@ -10,6 +10,9 @@ require('which-key').add {
   { '<leader>w', desc = '[W]orkspace' },
   { '<leader>t', desc = '[T]oggle' },
   { '<leader>h', desc = 'Git [H]unk' },
+  { '<leader>b', desc = 'Float[B]erm' },
+  { '<leader>x', desc = 'Trouble / Diagnostics' },
+  { '<leader>S', desc = '[S]pectre' },
 }
 -- visual mode
 require('which-key').add {
