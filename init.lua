@@ -4,25 +4,30 @@ vim.g.maplocalleader = ' '
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true
 
-package.path = package.path .. ';' .. vim.fn.stdpath 'config' .. '/?.lua'
-package.path = package.path .. ';' .. vim.fn.stdpath 'config' .. '/lua/custom/tools/?.lua'
-package.path = package.path .. ';' .. vim.fn.stdpath 'config' .. '/lua/custom/filetype_specific/?.lua'
-package.path = package.path .. ';' .. vim.fn.stdpath 'config' .. '/lua/custom/general/?.lua'
-
 -- The venv which holds relevant python packages
 vim.g.python3_host_prog = '/home/sean/.local/python_env_for_packages/env/bin/python'
 
--- [[ Custom Scripts etc ]]
-require 'custom-tools'
+-- [[ Editor configuration ]]
+require 'config.options'
+require 'config.keymaps'
+require 'config.autocmds'
 
--- [[ Setting options ]]
-require 'options'
+-- [[ Plugins (managed by vim.pack) ]]
+require 'plugins'
 
--- [[ Basic Keymaps ]]
-require 'keymaps'
+-- [[ LSP + native completion ]] (needs mason on the runtimepath, so load after plugins)
+require 'config.lsp'
 
--- [[ Install `lazy.nvim` plugin manager ]]
-require 'lazy-bootstrap'
+-- [[ Filetype specific ]]
+require 'ft.csv'
+require 'ft.gap'
+require 'ft.latex'
+require 'ft.markdown'
+require 'ft.mathematica'
+require 'ft.maxima'
+require 'ft.zsh'
 
--- [[ Configure and install plugins ]]
-require 'lazy-plugins'
+-- [[ General purpose ]]
+require 'lib.useful_shortcuts'
+
+-- vim: ts=2 sts=2 sw=2 et
