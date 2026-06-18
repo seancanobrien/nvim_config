@@ -56,6 +56,9 @@ vim.pack.add {
   { src = 'https://github.com/folke/todo-comments.nvim' },
   { src = 'https://github.com/folke/zen-mode.nvim' },
   { src = 'https://github.com/MeanderingProgrammer/render-markdown.nvim' },
+  { src = 'https://github.com/mluders/comfy-line-numbers.nvim' },
+  -- No Lua setup: autocmds flip relativenumber off in insert / unfocused windows.
+  { src = 'https://github.com/sitiom/nvim-numbertoggle' },
 
   -- Telescope + extensions
   -- master (not 0.1.x): the stable tag's previewer calls the removed
@@ -85,6 +88,7 @@ vim.pack.add {
   { src = 'https://github.com/nvim-pack/nvim-spectre' },
 
   -- Editing
+  { src = 'https://github.com/nguyenvukhang/nvim-toggler' },
   { src = 'https://github.com/SirVer/ultisnips' },
   { src = 'https://github.com/voldikss/vim-floaterm' },
   { src = 'https://github.com/mg979/vim-visual-multi' },
@@ -104,8 +108,9 @@ vim.pack.add {
 }
 
 -- Run each plugin's setup module. Plugins with no Lua setup (devicons, nui,
--- bqf, fzf/fzf.vim, diffview, ltex-extra, vim-mma, vim-sleuth, vim-visual-multi)
--- work just by being on the runtimepath, so they are omitted here.
+-- bqf, fzf/fzf.vim, diffview, ltex-extra, vim-mma, vim-sleuth, vim-visual-multi,
+-- nvim-numbertoggle) work just by being on the runtimepath, so they are omitted
+-- here.
 local modules = {
   'onedark',
   'gitsigns',
@@ -115,6 +120,7 @@ local modules = {
   'rainbow-delimiters',
   'todo-comments',
   'render-markdown',
+  'comfy-line-numbers',
   'telescope',
   'treesitter',
   'neo-tree',
@@ -125,6 +131,7 @@ local modules = {
   'auto-session',
   'spectre',
   'jupytext',
+  'nvim-toggler',
   'ultisnips',
   'vim-floaterm',
   'vimtex',
