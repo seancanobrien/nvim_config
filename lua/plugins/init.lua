@@ -61,8 +61,6 @@ vim.pack.add {
   { src = 'https://github.com/sitiom/nvim-numbertoggle' },
 
   -- Telescope + extensions
-  -- master (not 0.1.x): the stable tag's previewer calls the removed
-  -- nvim-treesitter `ft_to_lang`, incompatible with treesitter `main` / nvim 0.12.
   { src = 'https://github.com/nvim-telescope/telescope.nvim' },
   { src = 'https://github.com/nvim-telescope/telescope-fzf-native.nvim', data = { build = 'make' } },
   { src = 'https://github.com/nvim-telescope/telescope-ui-select.nvim' },
